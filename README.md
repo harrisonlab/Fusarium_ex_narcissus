@@ -17,7 +17,7 @@ Gene prediction
 Functional annotation
 
 
-# 0. Building of directory structure
+# 0. Recalling data and building of directory structure
 
 ### Minion Data
 
@@ -63,6 +63,7 @@ Functional annotation
   mkdir -p $ProjectDir/raw_dna/minion/F.oxysporum_fsp_narcissi/FON129
 ```
 
+### Basecalling
 
 Data was basecalled again using Albacore 2.02 on the minion server:
 
@@ -139,7 +140,7 @@ cd $OutDir
 
   cat $OutDir/albacore_v2.2.7/workspace/pass/*.fastq | gzip -cf > ${Strain}_${Date}_albacore_v2.2.7.fastq.gz
 
-  tar -cz -f ${Strain}_${Date}_albacore_v2.2.7.tar.gz $OutDir
+  # tar -cz -f ${Strain}_${Date}_albacore_v2.2.7.tar.gz $OutDir
 
   FinalDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
   mkdir -p $FinalDir
@@ -152,7 +153,7 @@ cd $OutDir
   Date=2017-12-03
   FlowCell="FLO-MIN106"
   Kit="SQK-LSK108"
-  RawDatDir=/data/scratch/nanopore_tmp_data/20171203_FON139/20171203_FON139/fast5/pass
+  RawDatDir=/data/scratch/nanopore_tmp_data/20171203_FON139/20171203_FON139/FON139/GA40000/reads/
   OutDir=~/FoNarcissi_2018-05-04/$Organism/$Strain/$Date
 
   mkdir -p $OutDir
@@ -164,15 +165,262 @@ cd $OutDir
     --recursive \
     --worker_threads 23 \
     --save_path albacore_v2.2.7 \
-    --output_format fastq,fast5 \
+    --output_format fastq \
     --reads_per_fastq_batch 4000
 
 
     cat $OutDir/albacore_v2.2.7/workspace/pass/*.fastq | gzip -cf > ${Strain}_${Date}_albacore_v2.2.7.fastq.gz
 
-    tar -cz -f ${Strain}_${Date}_albacore_v2.2.7.tar.gz $OutDir
-
     FinalDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
     mkdir -p $FinalDir
     mv *_albacore_v2.2.7.* $FinalDir/.
     chmod +rw -R $FinalDir
+
+    # Oxford nanopore FON89
+    Organism=F.oxysporum_fsp_narcissi
+    Strain=FON89
+    Date=2017-12-21
+    FlowCell="FLO-MIN106"
+    Kit="SQK-LSK108"
+    RawDatDir=/data/scratch/nanopore_tmp_data/20171203_FON77/20171221_FON77/FON77/GA40000/reads/
+    OutDir=~/FoNarcissi_2018-05-04/$Organism/$Strain/$Date
+
+    mkdir -p $OutDir
+    cd $OutDir
+    ~/.local/bin/read_fast5_basecaller.py \
+      --flowcell $FlowCell \
+      --kit $Kit \
+      --input $RawDatDir \
+      --recursive \
+      --worker_threads 23 \
+      --save_path albacore_v2.2.7 \
+      --output_format fastq \
+      --reads_per_fastq_batch 4000
+
+
+      cat $OutDir/albacore_v2.2.7/workspace/pass/*.fastq | gzip -cf > ${Strain}_${Date}_albacore_v2.2.7.fastq.gz
+
+      FinalDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+      mkdir -p $FinalDir
+      mv *_albacore_v2.2.7.* $FinalDir/.
+      chmod +rw -R $FinalDir
+
+
+      # Oxford nanopore FON81
+      Organism=F.oxysporum_fsp_narcissi
+      Strain=FON81
+      Date=2017-12-21
+      FlowCell="FLO-MIN106"
+      Kit="SQK-LSK108"
+      RawDatDir=/data/seq_data/minion/2018/20180127_FON81/FON81/FON81
+      # RawDatDir=/data/seq_data/minion/2018/20180127_FON81/FON81/FON81/GA10000/reads
+      # RawDatDir=/data/seq_data/minion/2018/20180127_FON81/FON81/FON81/GA20000/reads
+      OutDir=~/FoNarcissi_2018-05-04/$Organism/$Strain/$Date
+
+      mkdir -p $OutDir
+      cd $OutDir
+      ~/.local/bin/read_fast5_basecaller.py \
+        --flowcell $FlowCell \
+        --kit $Kit \
+        --input $RawDatDir \
+        --recursive \
+        --worker_threads 23 \
+        --save_path albacore_v2.2.7 \
+        --output_format fastq \
+        --reads_per_fastq_batch 4000
+
+
+        cat $OutDir/albacore_v2.2.7/workspace/pass/*.fastq | gzip -cf > ${Strain}_${Date}_albacore_v2.2.7.fastq.gz
+
+        FinalDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+        mkdir -p $FinalDir
+        mv *_albacore_v2.2.7.* $FinalDir/.
+        chmod +rw -R $FinalDir
+
+        # Oxford nanopore FON81
+        Organism=F.oxysporum_fsp_narcissi
+        Strain=FON129
+        Date=2017-12-21
+        FlowCell="FLO-MIN106"
+        Kit="SQK-LSK108"
+        RawDatDir=/data/seq_data/minion/2018/20180222_FON129/FON129/
+        OutDir=~/FoNarcissi_2018-05-04/$Organism/$Strain/$Date
+
+        mkdir -p $OutDir
+        cd $OutDir
+        ~/.local/bin/read_fast5_basecaller.py \
+          --flowcell $FlowCell \
+          --kit $Kit \
+          --input $RawDatDir \
+          --recursive \
+          --worker_threads 23 \
+          --save_path albacore_v2.2.7 \
+          --output_format fastq \
+          --reads_per_fastq_batch 4000
+
+
+          cat $OutDir/albacore_v2.2.7/workspace/pass/*.fastq | gzip -cf > ${Strain}_${Date}_albacore_v2.2.7.fastq.gz
+
+          FinalDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+          mkdir -p $FinalDir
+          mv *_albacore_v2.2.7.* $FinalDir/.
+          chmod +rw -R $FinalDir
+```
+
+### Copying recalled reads to the project directory directory
+
+```bash
+DataDir=$(ls -d /data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7)
+ProjectDir=/home/groups/harrisonlab/project_files/fusarium_ex_narcissus
+# FON139
+# 19-09-17
+# 30-11-17
+OutDir=$ProjectDir/raw_dna/minion/F.oxysporum_fsp_narcissi/FON139
+mkdir -p $OutDir
+cp -s $DataDir/FON139_2017-09-20_albacore_v2.2.7.fastq.gz $OutDir/.
+cp -s $DataDir/FON139_2017-12-03_albacore_v2.2.7.fastq.gz $OutDir/.
+# FON77
+# 19-09-17
+# 12-12-17
+OutDir=$ProjectDir/raw_dna/minion/F.oxysporum_fsp_narcissi/FON77
+mkdir -p $OutDir
+cp -s $DataDir/FON77_2017-09-20_albacore_v2.2.7.fastq.gz $OutDir/.
+cp -s $DataDir/FON77_2017-12-03_albacore_v2.2.7.fastq.gz $OutDir/.
+# FON89
+# 12-12-17
+OutDir=$ProjectDir/raw_dna/minion/F.oxysporum_fsp_narcissi/FON89
+mkdir -p $OutDir
+cp -s $DataDir/FON89_2017-12-21_albacore_v2.2.7.fastq.gz $OutDir/.
+# FON81
+# 26-01-18
+OutDir=$ProjectDir/raw_dna/minion/F.oxysporum_fsp_narcissi/FON81
+mkdir -p $OutDir
+cp -s $DataDir/FON81_2017-12-21_albacore_v2.2.7.fastq.gz $OutDir/.
+# FON129
+# 22-02-18
+OutDir=$ProjectDir/raw_dna/minion/F.oxysporum_fsp_narcissi/FON129
+mkdir -p $OutDir
+cp -s $DataDir/FON129_2017-12-21_albacore_v2.2.7.fastq.gz $OutDir/.
+```
+
+
+
+### Copying MiSeq reads to the project Directory
+
+Trimmed Miseq reads were available in the fusarium project directory at:
+/home/groups/harrisonlab/project_files/fusarium
+
+<!--
+```bash
+  ProjectDir=/home/groups/harrisonlab/project_files/fusarium_ex_narcissus
+  # HAPI_seq_3 FON139
+  RawDatDir=/home/groups/harrisonlab/raw_data/raw_seq/fusarium/HAPI_seq_3
+  OutDir=$ProjectDir/raw_dna/paired/F.oxysporum_fsp_narcissi/FON139
+  mkdir -p $OutDir/F
+  mkdir -p $OutDir/R
+	cp $RawDatDir/FoxysporumN139_S2_L001_R1_001.fastq.gz $ProjectDir/$OutDir/F/.
+	cp $RawDatDir/FoxysporumN139_S2_L001_R2_001.fastq.gz $ProjectDir/$OutDir/R/.
+  # 171006 FON129
+	# RawDatDir=/data/seq_data/miseq/2017/RAW/171006_M04465_0050_000000000-B49T7/Data/Intensities/BaseCalls
+  RawDatDir=/home/groups/harrisonlab/project_files/fusarium/raw_dna/paired/F.oxysporum_fsp_narcissi/FON129
+	OutDir=$ProjectDir/raw_dna/paired/F.oxysporum_fsp_narcissi/FON129
+	mkdir -p $OutDir/F
+	mkdir -p $OutDir/R
+	cp -s $RawDatDir/F/FON129_S2_L001_R1_001.fastq.gz $ProjectDir/$OutDir/F/.
+	cp -s $RawDatDir/R/FON129_S2_L001_R2_001.fastq.gz $ProjectDir/$OutDir/R/.
+  # 170926 FON77
+  RawDatDir=/data/seq_data/miseq/2017/RAW/170926_M04465_0049_000000000-B49VF/Data/Intensities/BaseCalls
+	OutDir=$ProjectDir/raw_dna/paired/F.oxysporum_fsp_narcissi/FON77
+	mkdir -p $OutDir/F
+	mkdir -p $OutDir/R
+  cd $OutDir/F
+	cp -s $RawDatDir/FON77_S1_L001_R1_001.fastq.gz .
+  cd $OutDir/R
+	cp -s $RawDatDir/FON77_S1_L001_R2_001.fastq.gz .
+  # FON81
+  OutDir=$ProjectDir/raw_dna/paired/F.oxysporum_fsp_narcissi/FON81
+  mkdir -p $OutDir/F
+  mkdir -p $OutDir/R
+  cd $OutDir/F
+  cp -s $RawDatDir/FON81_S2_L001_R1_001.fastq.gz .
+  cd $OutDir/R
+  cp -s $RawDatDir/FON81_S2_L001_R2_001.fastq.gz .
+  # FON89
+  OutDir=$ProjectDir/raw_dna/paired/F.oxysporum_fsp_narcissi/FON89
+  mkdir -p $OutDir/F
+  mkdir -p $OutDir/R
+  cd $OutDir/F
+  cp -s $RawDatDir/FON89_S3_L001_R1_001.fastq.gz .
+  cd $OutDir/R
+  cp -s $RawDatDir/FON89_S3_L001_R2_001.fastq.gz .
+``` -->
+
+
+
+## Assembly
+
+### Removal of adapters
+
+Splitting reads and trimming adapters using porechop
+```bash
+  ProjectDir=/home/groups/harrisonlab/project_files/fusarium_ex_narcissus
+  cd $ProjectDir
+  for RawReads in $(ls raw_dna/minion/*/*/*.fastq.gz); do
+    Organism=$(echo $RawReads| rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $RawReads | rev | cut -f2 -d '/' | rev)
+    echo "$Organism - $Strain"
+    OutDir=qc_dna/minion/$Organism/$Strain
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+    qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
+  done
+```
+
+
+## Identify sequencing coverage
+
+For Minion data:
+```bash
+for RawData in $(ls qc_dna/minion/*/*/*q.gz); do
+echo $RawData;
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
+GenomeSz=58
+OutDir=$(dirname $RawData)
+# OutDir=$(echo $RawData | cut -f11,12,13,14 -d '/')
+mkdir -p $OutDir
+qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
+done
+```
+
+```bash
+  for StrainDir in $(ls -d qc_dna/minion/*/*); do
+    Strain=$(basename $StrainDir)
+    printf "$Strain\t"
+    for File in $(ls $StrainDir/*cov.txt); do
+      echo $(basename $File);
+      cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
+    done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
+  done
+```
+
+MinION coverage
+
+```
+FON129	103.57
+FON139	79.61
+FON77	79.62
+FON81	76.12
+FON89	72.76
+```
+
+
+### Read correction using Canu
+
+```bash
+for TrimReads in $(ls qc_dna/minion/*/*/*q.gz); do
+Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
+OutDir=assembly/canu-1.6/$Organism/"$Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
+qsub $ProgDir/sub_canu_correction.sh $TrimReads 58m $Strain $OutDir
+done
+```
