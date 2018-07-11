@@ -423,7 +423,7 @@ FON89	72.76
 ### Read correction using Canu
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/*/*/*q.gz); do
+for TrimReads in $(ls qc_dna/minion/*/*/*q.gz | grep 'FON89'); do
 Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
 OutDir=assembly/canu-1.6/$Organism/"$Strain"
@@ -564,8 +564,9 @@ done
 
 ```
 
+For FON129
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON81'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -574,10 +575,26 @@ echo "$Organism - $Strain"
 ReadDir=raw_dna/nanopolish/$Organism/$Strain
 mkdir -p $ReadDir
 ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz)
-raw_dna/minion/*/$Strain/*.fastq.gz)
-ScratchDir=/data/scratch/armita/alternaria
-Fast5Dir=$ScratchDir/albacore_v2.1.10/Alt_albacore_v2.10_demultiplexed/workspace/pass/barcode01
+CurDir=$PWD
+ScratchDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+cd $ScratchDir
+# tar -zxvf ${Strain}*_albacore_v2.2.7.tar.gz
+cd $CurDir
+Fast5Dir=$(ls -d home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON129/2017-12-21/albacore_v2.2.7/workspace/pass)
+# Fast5Dir=$(ls -d $ScratchDir/${Strain}/2017-12-21/albacore_v2.2.7/workspace/pass)
+# nanopolish index -d $Fast5Dir $ReadsFq
 nanopolish index -d $Fast5Dir $ReadsFq
+done
+
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+# ReadDir=raw_dna/nanopolish/$Organism/$Strain
+# mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz)
 OutDir=$(dirname $Assembly)/nanopolish
 mkdir -p $OutDir
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
@@ -586,8 +603,10 @@ qsub $ProgDir/sub_minimap2_nanopolish.sh $Assembly $ReadsFq $OutDir/nanopolish
 done
 ```
 
+
+For FON139
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/650/racon2_10/racon_min_500bp_renamed.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON139'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -595,11 +614,30 @@ echo "$Organism - $Strain"
 # Note - the full path from home must be used
 ReadDir=raw_dna/nanopolish/$Organism/$Strain
 mkdir -p $ReadDir
-ReadsFq=$(ls ../../../../../home/groups/harrisonlab/project_files/alternaria/raw_dna/minion/*/$Strain/*.fastq.gz)
-ScratchDir=/data/scratch/armita/alternaria
-Fast5Dir=$ScratchDir/albacore_v2.1.10/Alt_albacore_v2.10_demultiplexed/workspace/pass/barcode02
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz | grep '2017-12-03')
+# cat $ReadsFq > $ReadDir/${Strain}_appended.fastq.gz
+CurDir=$PWD
+ScratchDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+# cd $ScratchDir
+# tar -zxvf $ScratchDir/FON139_2017-12-03_albacore_v2.2.7.tar.gz -C $ReadDir
+# tar -zxvf $ScratchDir/FON139_FON77_2017-09-20_albacore_v2.2.7.tar.gz -C $ReadDir
+# cd $CurDir
+Fast5Dir=$(ls -d $PWD/$ReadDir/home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON139/2017-12-03/albacore_v2.2.7/workspace/pass)
+# Fast5Dir=$(ls -d $PWD/$ReadDir/home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON139/2017-12-03/albacore_v2.2.7/workspace/pass $PWD/$ReadDir/home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON139_FON77/2017-09-20/albacore_v2.2.7/workspace/pass/barcode03)
 # nanopolish index -d $Fast5Dir $ReadsFq
-OutDir=$(dirname $Assembly)
+nanopolish index -d $Fast5Dir $ReadsFq
+done
+
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON139'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+# ReadDir=raw_dna/nanopolish/$Organism/$Strain
+# mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/nanopolish/$Organism/$Strain/${Strain}_appended.fastq.gz)
+OutDir=$(dirname $Assembly)/nanopolish
 mkdir -p $OutDir
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 # submit alignments for nanoppolish
@@ -607,17 +645,93 @@ qsub $ProgDir/sub_minimap2_nanopolish.sh $Assembly $ReadsFq $OutDir/nanopolish
 done
 ```
 
+
+For FON77
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON77'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+ReadDir=raw_dna/nanopolish/$Organism/$Strain
+mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz | grep '2017-12-03')
+# cat $ReadsFq > $ReadDir/${Strain}_appended.fastq.gz
+CurDir=$PWD
+ScratchDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+tar -zxvf $ScratchDir/FON139_2017-12-03_albacore_v2.2.7.tar.gz -C $ReadDir
+Fast5Dir=$(ls -d $PWD/$ReadDir/home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON139/2017-12-03/albacore_v2.2.7/workspace/pass/)
+nanopolish index -d $Fast5Dir $ReadsFq
+done
+
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON77'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+# ReadDir=raw_dna/nanopolish/$Organism/$Strain
+# mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz | grep '2017-12-03')
+OutDir=$(dirname $Assembly)/nanopolish
+mkdir -p $OutDir
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
+# submit alignments for nanoppolish
+qsub $ProgDir/sub_minimap2_nanopolish.sh $Assembly $ReadsFq $OutDir/nanopolish
+done
+```
+
+
+For FON81
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON81'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+ReadDir=raw_dna/nanopolish/$Organism/$Strain
+mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz)
+# cat $ReadsFq > $ReadDir/${Strain}_appended.fastq.gz
+CurDir=$PWD
+ScratchDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+# tar -zxvf $ScratchDir/FON81_2017-12-21_albacore_v2.2.7.tar.gz -C $ReadDir
+Fast5Dir=$(ls -d $PWD/$ReadDir/home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON81/2017-12-21/albacore_v2.2.7/workspace/pass/)
+nanopolish index -d $Fast5Dir $ReadsFq
+done
+
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON81'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+# ReadDir=raw_dna/nanopolish/$Organism/$Strain
+# mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz)
+OutDir=$(dirname $Assembly)/nanopolish
+mkdir -p $OutDir
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
+# submit alignments for nanoppolish
+qsub $ProgDir/sub_minimap2_nanopolish.sh $Assembly $ReadsFq $OutDir/nanopolish
+done
+```
+
+
+
  Split the assembly into 50Kb fragments an submit each to the cluster for
  nanopolish correction
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon2_10/racon_min_500bp_renamed.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77'| grep -e 'FON77'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 OutDir=$(dirname $Assembly)/nanopolish
-RawReads=$(ls ../../../../../home/groups/harrisonlab/project_files/alternaria/raw_dna/minion/*/$Strain/*.fastq.gz)
-AlignedReads=$(ls $OutDir/reads.sorted.bam)
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz | grep '2017-12-03')
+AlignedReads=$(ls $OutDir/nanopolish/reads.sorted.bam)
 
 NanoPolishDir=/home/armita/prog/nanopolish/nanopolish/scripts
 python $NanoPolishDir/nanopolish_makerange.py $Assembly --segment-length 50000 > $OutDir/nanopolish_range.txt
@@ -635,15 +749,16 @@ printf "\n"
 echo $Region
 echo $Region >> $OutDir/nanopolish_log.txt
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
-qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
+qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $ReadsFq $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 done
 ```
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon2_10/racon_min_500bp_renamed.fasta | grep '1166'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' | grep 'FON139'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
 OutDir=assembly/SMARTdenovo/$Organism/$Strain/nanopolish
 mkdir -p $OutDir
 # cat "" > $OutDir/"$Strain"_nanoplish.fa
@@ -660,8 +775,7 @@ done
 Quast and busco were run to assess the effects of nanopolish on assembly quality:
 
 ```bash
-
-for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
 # Quast
@@ -669,9 +783,32 @@ OutDir=$(dirname $Assembly)
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 # Busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/ascomycota_odb9)
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
+```
+
+```bash
+  for File in $(ls gene_pred/busco/*/*/assembly/*/short_summary_*.txt); do
+  Strain=$(echo $File| rev | cut -d '/' -f4 | rev)
+  Organism=$(echo $File | rev | cut -d '/' -f5 | rev)
+  Complete=$(cat $File | grep "(C)" | cut -f2)
+  Single=$(cat $File | grep "(S)" | cut -f2)
+  Fragmented=$(cat $File | grep "(F)" | cut -f2)
+  Missing=$(cat $File | grep "(M)" | cut -f2)
+  Total=$(cat $File | grep "Total" | cut -f2)
+  echo -e "$Organism\t$Strain\t$Complete\t$Single\t$Fragmented\t$Missing\t$Total"
+  done
+```
+
+
+Remove unpacked fast5 files:
+
+```bash
+# FON129
+rm -r /home/groups/harrisonlab/project_files/fusarium_ex_narcissus/home
+# FON139
+rm -r raw_dna/nanopolish/F.oxysporum_fsp_narcissi/FON139/home
 ```
