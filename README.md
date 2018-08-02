@@ -183,7 +183,7 @@ cd $OutDir
     Date=2017-12-21
     FlowCell="FLO-MIN106"
     Kit="SQK-LSK108"
-    RawDatDir=/data/scratch/nanopore_tmp_data/20171203_FON77/20171221_FON77/FON77/GA40000/reads/
+    RawDatDir=/data/scratch/nanopore_tmp_data/20171203_FON89/20171221_FON89/FON89/GA50000/reads
     OutDir=~/FoNarcissi_2018-05-04/$Organism/$Strain/$Date
 
     mkdir -p $OutDir
@@ -450,7 +450,7 @@ done
 Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/*.dmo.lay.utg ); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/*.dmo.lay.utg | grep 'FON89'); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
 	echo "$Organism - $Strain"
@@ -468,7 +468,7 @@ done
 Error correction using racon:
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/*.dmo.lay.utg | grep -e 'FON129' -e 'FON81'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/*.dmo.lay.utg | grep -e 'FON129' -e 'FON81' -e 'FON89'); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -496,7 +496,7 @@ done
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/*.fasta | grep 'round_10'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/*.fasta | grep 'round_10' | grep 'FON89'); do
 OutDir=$(dirname $Assembly)
 echo "" > tmp.txt
 ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
@@ -508,7 +508,7 @@ Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep 'FON89'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
 OutDir=$(dirname $Assembly)
@@ -518,7 +518,7 @@ done
 
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/*.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/*.fasta | grep 'FON89'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 Jobs=$(qstat | grep 'sub_busco' | grep 'qw' | wc -l)
@@ -719,6 +719,42 @@ qsub $ProgDir/sub_minimap2_nanopolish.sh $Assembly $ReadsFq $OutDir/nanopolish
 done
 ```
 
+For FON89
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON89'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+ReadDir=raw_dna/nanopolish/$Organism/$Strain
+mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz)
+# cat $ReadsFq > $ReadDir/${Strain}_appended.fastq.gz
+CurDir=$PWD
+ScratchDir=/data/scratch/nanopore_tmp_data/FON/albacore_v2.2.7
+# tar -zxvf $ScratchDir/FON89_2017-12-21_albacore_v2.2.7.tar.gz -C $ReadDir
+Fast5Dir=$(ls -d $PWD/$ReadDir/home/nanopore/FoNarcissi_2018-05-04/F.oxysporum_fsp_narcissi/FON89/2017-12-21/albacore_v2.2.7/workspace/pass)
+nanopolish index -d $Fast5Dir $ReadsFq
+done
+
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON89'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Note - the full path from home must be used
+# ReadDir=raw_dna/nanopolish/$Organism/$Strain
+# mkdir -p $ReadDir
+ReadsFq=$(ls raw_dna/minion/*/$Strain/*.fastq.gz)
+OutDir=$(dirname $Assembly)/nanopolish
+mkdir -p $OutDir
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
+# submit alignments for nanoppolish
+qsub $ProgDir/sub_minimap2_nanopolish.sh $Assembly $ReadsFq $OutDir/nanopolish
+done
+```
+
 
 
  Split the assembly into 50Kb fragments an submit each to the cluster for
@@ -773,25 +809,25 @@ python $NanoPolishDir/nanopolish_makerange.py $Assembly --segment-length 50000 >
 Ploidy=1
 echo "nanopolish log:" > $OutDir/nanopolish_log.txt
 # For FON81
-for Region in $(cat $OutDir/nanopolish_range.txt | grep -e 'contig_2:3200000-3250200' -e 'contig_2:3250000-3300200' -e 'contig_2:3900000-3950200' -e 'contig_2:4150000-4193712' -e 'contig_30:350000-400200'); do
-Jobs=$(qstat | grep 'sub_nanopo' | grep 'qw' | wc -l)
-while [ $Jobs -gt 1 ]; do
-sleep 1m
-printf "."
-Jobs=$(qstat | grep 'sub_nanopo' | grep 'qw' | wc -l)
-done		
-printf "\n"
+ls -lh $OutDir/*/*.fa | grep -v ' 0 ' | cut -f8 -d '/' | sed 's/_consensus.fa//g' > $OutDir/files_present.txt
+for Region in $(cat $OutDir/nanopolish_range.txt | grep -vwf "$OutDir/files_present.txt"); do
+# Jobs=$(qstat | grep 'sub_nanopo' | grep 'qw' | wc -l)
+# while [ $Jobs -gt 1 ]; do
+# sleep 1m
+# printf "."
+# Jobs=$(qstat | grep 'sub_nanopo' | grep 'qw' | wc -l)
+# done		
+# printf "\n"
 echo $Region
 echo $Region >> $OutDir/nanopolish_log.txt
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants_high_mem.sh $Assembly $ReadsFq $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 done
-
 ```
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' | grep 'FON139'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' -e 'FON81'| grep 'FON81'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -811,7 +847,7 @@ done
 Quast and busco were run to assess the effects of nanopolish on assembly quality:
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' | grep 'FON81'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
 # Quast
@@ -847,4 +883,72 @@ Remove unpacked fast5 files:
 rm -r /home/groups/harrisonlab/project_files/fusarium_ex_narcissus/home
 # FON139
 rm -r raw_dna/nanopolish/F.oxysporum_fsp_narcissi/FON139/home
+```
+
+### Pilon assembly correction
+
+Assemblies were polished using Pilon
+
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77'); do
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+Strain_mod=$(echo $Strain | sed 's/FO//g')
+IlluminaDir=$(ls -d ../fusarium/qc_dna/paired/*/*$Strain_mod)
+TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+OutDir=$(dirname $Assembly)/../pilon
+Iterations=10
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+done
+```
+
+Contigs were renamed
+```bash
+echo "" > tmp.txt
+Assembly=$(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'FON_63' | grep 'pilon_10')
+OutDir=$(dirname $Assembly)
+ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+$ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+```
+
+Quast and busco were run to assess the effects of pilon on assembly quality:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'FON_63' | grep 'pilon_min_500bp_renamed.fasta'); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'FON_63'); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly
+qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+done
+```
+
+
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'FON_63'); do  
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
 ```
