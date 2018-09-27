@@ -794,7 +794,7 @@ done
 A subset of nanopolish jobs needed to be resubmitted as the ran out of RAM
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' | grep 'FON81'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' -e 'FON81' -e 'FON89'| grep -e 'FON81' -e 'FON89'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -819,7 +819,7 @@ done
 ```
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' -e 'FON81'| grep 'FON81'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/racon_10/racon_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' -e 'FON81' -e 'FON89'| grep -e 'FON81'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -839,7 +839,7 @@ done
 Quast and busco were run to assess the effects of nanopolish on assembly quality:
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' | grep 'FON81'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' -e 'FON81' -e 'FON89' | grep -e 'FON81'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
 # Quast
@@ -858,12 +858,13 @@ done
   for File in $(ls gene_pred/busco/*/*/assembly/*/short_summary_*.txt); do
   Strain=$(echo $File| rev | cut -d '/' -f4 | rev)
   Organism=$(echo $File | rev | cut -d '/' -f5 | rev)
+  Version=$(echo $File | rev | cut -d '/' -f2 | rev)
   Complete=$(cat $File | grep "(C)" | cut -f2)
   Single=$(cat $File | grep "(S)" | cut -f2)
   Fragmented=$(cat $File | grep "(F)" | cut -f2)
   Missing=$(cat $File | grep "(M)" | cut -f2)
   Total=$(cat $File | grep "Total" | cut -f2)
-  echo -e "$Organism\t$Strain\t$Complete\t$Single\t$Fragmented\t$Missing\t$Total"
+  echo -e "$Organism\t$Strain\t$Version\t$Complete\t$Single\t$Fragmented\t$Missing\t$Total"
   done
 ```
 
@@ -882,7 +883,7 @@ rm -r raw_dna/nanopolish/F.oxysporum_fsp_narcissi/FON139/home
 Assemblies were polished using Pilon
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep -e 'FON129' -e 'FON139' -e 'FON77' -e 'FON81' -e 'FON89' | grep -e 'FON81' -e 'FON89'); do
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -899,42 +900,43 @@ done
 
 Contigs were renamed
 ```bash
-echo "" > tmp.txt
-Assembly=$(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'FON_63' | grep 'pilon_10')
-OutDir=$(dirname $Assembly)
-ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
-$ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'pilon_10' | grep -e 'FON81' -e 'FON89'); do
+  echo "" > tmp.txt
+  OutDir=$(dirname $Assembly)
+  ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+  $ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+done
 ```
 
 Quast and busco were run to assess the effects of pilon on assembly quality:
 
-```bash
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'FON_63' | grep 'pilon_min_500bp_renamed.fasta'); do
-  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
-  OutDir=$(dirname $Assembly)
-  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
-```
-
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'FON_63'); do
+for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/*.fasta | grep 'pilon_10'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+# Jobs=$(qstat | grep 'sub_busco' | grep 'qw' | wc -l)
+# while [ $Jobs -gt 1 ]; do
+# sleep 1m
+# printf "."
+# Jobs=$(qstat | grep 'sub_busco' | grep 'qw' | wc -l)
+# done		
+# printf "\n"
 echo "$Organism - $Strain"
+OutDir=$(dirname $Assembly)
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
 
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'FON_63'); do  
+for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt); do
 FileName=$(basename $File)
 Complete=$(cat $File | grep "(C)" | cut -f2)
 Duplicated=$(cat $File | grep "(D)" | cut -f2)
@@ -943,4 +945,49 @@ Missing=$(cat $File | grep "(M)" | cut -f2)
 Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
+```
+
+
+# Repeat Masking
+
+Repeat masking was performed on the non-hybrid assembly.
+
+```bash
+  for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/pilon_min_500bp_renamed.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    OutDir=repeat_masked/$Organism/"$Strain"/filtered_contigs
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+  done
+```
+
+The TransposonPSI masked bases were used to mask additional bases from the
+repeatmasker / repeatmodeller softmasked and hardmasked files.
+
+```bash
+
+for File in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa | grep 'FON_63'); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+echo "Number of masked bases:"
+cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+done
+# The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
+for File in $(ls repeat_masked/*/*/*/*_contigs_hardmasked.fa | grep 'FON_63'); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_hardmasked.fa/_contigs_hardmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
+done
+```
+```
+Number of masked bases:
+9075386
 ```
