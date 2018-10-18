@@ -947,6 +947,73 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
+```
+short_summary_FON129_nanoplish_min_500bp_renamed.txt	2780	19	499	446	3725
+short_summary_FON129_smartdenovo.dmo.lay.txt	865	6	706	2154	3725
+short_summary_pilon_10.txt	3691	44	15	19	3725
+short_summary_pilon_1.txt	3648	44	40	37	3725
+short_summary_pilon_2.txt	3688	44	18	19	3725
+short_summary_pilon_3.txt	3690	44	15	20	3725
+short_summary_pilon_4.txt	3691	44	15	19	3725
+short_summary_pilon_5.txt	3691	44	15	19	3725
+short_summary_pilon_6.txt	3691	44	15	19	3725
+short_summary_pilon_7.txt	3691	44	15	19	3725
+short_summary_pilon_8.txt	3691	44	15	19	3725
+short_summary_pilon_9.txt	3691	44	15	19	3725
+short_summary_pilon_min_500bp_renamed.txt	3691	44	15	19	3725
+short_summary_FON139_nanoplish_min_500bp_renamed.txt	3356	34	200	169	3725
+short_summary_FON139_smartdenovo.dmo.lay.txt	637	2	561	2527	3725
+short_summary_pilon_10.txt	3689	39	13	23	3725
+short_summary_pilon_1.txt	3660	39	31	34	3725
+short_summary_pilon_2.txt	3679	39	20	26	3725
+short_summary_pilon_3.txt	3689	39	13	23	3725
+short_summary_pilon_4.txt	3688	39	14	23	3725
+short_summary_pilon_5.txt	3689	39	13	23	3725
+short_summary_pilon_6.txt	3689	39	13	23	3725
+short_summary_pilon_7.txt	3689	39	13	23	3725
+short_summary_pilon_8.txt	3689	39	13	23	3725
+short_summary_pilon_9.txt	3689	39	13	23	3725
+short_summary_pilon_min_500bp_renamed.txt	3689	39	13	23	3725
+short_summary_FON77_nanoplish_min_500bp_renamed.txt	3356	35	197	172	3725
+short_summary_FON77_smartdenovo.dmo.lay.txt	637	2	561	2527	3725
+short_summary_pilon_10.txt	3690	39	12	23	3725
+short_summary_pilon_1.txt	3657	37	34	34	3725
+short_summary_pilon_2.txt	3675	40	21	29	3725
+short_summary_pilon_3.txt	3690	39	12	23	3725
+short_summary_pilon_4.txt	3690	39	12	23	3725
+short_summary_pilon_5.txt	3690	39	12	23	3725
+short_summary_pilon_6.txt	3690	39	12	23	3725
+short_summary_pilon_7.txt	3690	39	12	23	3725
+short_summary_pilon_8.txt	3690	39	12	23	3725
+short_summary_pilon_9.txt	3690	39	12	23	3725
+short_summary_pilon_min_500bp_renamed.txt	3690	39	12	23	3725
+short_summary_FON81_nanoplish_min_500bp_renamed.txt	3398	33	168	159	3725
+short_summary_FON81_smartdenovo.dmo.lay.txt	851	2	689	2185	3725
+short_summary_pilon_10.txt	3688	41	15	22	3725
+short_summary_pilon_1.txt	3672	41	28	25	3725
+short_summary_pilon_2.txt	3685	41	17	23	3725
+short_summary_pilon_3.txt	3688	41	15	22	3725
+short_summary_pilon_4.txt	3688	41	15	22	3725
+short_summary_pilon_5.txt	3688	41	15	22	3725
+short_summary_pilon_6.txt	3688	41	15	22	3725
+short_summary_pilon_7.txt	3688	41	15	22	3725
+short_summary_pilon_8.txt	3688	41	15	22	3725
+short_summary_pilon_9.txt	3688	41	15	22	3725
+short_summary_pilon_min_500bp_renamed.txt	3688	41	15	22	3725
+short_summary_FON89_nanoplish_min_500bp_renamed.txt	3543	34	97	85	3725
+short_summary_FON89_smartdenovo.dmo.lay.txt	1255	5	817	1653	3725
+short_summary_pilon_10.txt	3691	39	15	19	3725
+short_summary_pilon_1.txt	3691	39	15	19	3725
+short_summary_pilon_2.txt	3691	39	15	19	3725
+short_summary_pilon_3.txt	3691	39	15	19	3725
+short_summary_pilon_4.txt	3691	39	15	19	3725
+short_summary_pilon_5.txt	3691	39	15	19	3725
+short_summary_pilon_6.txt	3691	39	15	19	3725
+short_summary_pilon_7.txt	3691	39	15	19	3725
+short_summary_pilon_8.txt	3691	39	15	19	3725
+short_summary_pilon_9.txt	3691	39	15	19	3725
+short_summary_pilon_min_500bp_renamed.txt	3691	39	15	19	3725
+```
 
 # Repeat Masking
 
@@ -969,7 +1036,7 @@ repeatmasker / repeatmodeller softmasked and hardmasked files.
 
 ```bash
 
-for File in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa | grep 'FON_63'); do
+for File in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa); do
 OutDir=$(dirname $File)
 TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
 OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
@@ -979,7 +1046,7 @@ echo "Number of masked bases:"
 cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
 done
 # The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
-for File in $(ls repeat_masked/*/*/*/*_contigs_hardmasked.fa | grep 'FON_63'); do
+for File in $(ls repeat_masked/*/*/*/*_contigs_hardmasked.fa); do
 OutDir=$(dirname $File)
 TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
 OutFile=$(echo $File | sed 's/_contigs_hardmasked.fa/_contigs_hardmasked_repeatmasker_TPSI_appended.fa/g')
@@ -988,6 +1055,19 @@ bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
 done
 ```
 ```
+repeat_masked/F.oxysporum_fsp_narcissi/FON129/filtered_contigs/FON129_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
-9075386
+8669832
+repeat_masked/F.oxysporum_fsp_narcissi/FON139/filtered_contigs/FON139_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+9341930
+repeat_masked/F.oxysporum_fsp_narcissi/FON77/filtered_contigs/FON77_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+9204879
+repeat_masked/F.oxysporum_fsp_narcissi/FON81/filtered_contigs/FON81_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+7953366
+repeat_masked/F.oxysporum_fsp_narcissi/FON89/filtered_contigs/FON89_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+9981685
 ```
