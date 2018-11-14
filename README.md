@@ -1071,3 +1071,90 @@ repeat_masked/F.oxysporum_fsp_narcissi/FON89/filtered_contigs/FON89_contigs_soft
 Number of masked bases:
 9981685
 ```
+
+# Gene prediction
+
+## RNA QC
+
+RNAseq data has been previously qc'd as part of the commands contatined in the
+Fusarium repository README document.
+
+## Alignment
+
+Then Rnaseq data was aligned to each genome assembly:
+
+```bash
+for Assembly in $(ls repeat_masked/*/*/*/*_contigs_unmasked.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+# echo "$Organism - $Strain"
+for RNADir in $(ls -d ../fusarium/qc_rna/paired/F.oxysporum_fsp_cepae/* | grep -v -e 'control' -e 'prelim'); do
+Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+FileF=$(ls $RNADir/F/*_trim.fq.gz)
+FileR=$(ls $RNADir/R/*_trim.fq.gz)
+OutDir=alignment/$Organism/$Strain/$Timepoint
+Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+while [ $Jobs -gt 1 ]; do
+sleep 1m
+printf "."
+Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+done
+# printf "\n"
+# printf "\n"
+echo "$Organism - $Strain - $Timepoint"
+# echo $FileF
+# echo $FileR
+# Prefix=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+OutDir=../../../../../data2/scratch/armita/fusarium_ex_narcissus/alignment/star/$Organism/$Strain/$Timepoint
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
+qsub $ProgDir/sub_star.sh $Assembly $FileF $FileR $OutDir
+echo "$Strain\t$Timepoint" >> alignment.log
+done
+done
+```
+
+
+Performed alignment of RNAseq data vs the F. vesca genome and those reads that did not align were
+used for alignment vs the P.cactorum genome.
+
+
+
+
+
+
+
+
+## 5.1  Identifying SIX gene homologs
+
+## 5.1.a) Performing BLAST searches
+
+BLast searches were performed against the genome:
+
+```bash
+  for Assembly in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa); do
+    ProgDir=/home/armita/git_repos/emr_repos/tools/pathogen/blast
+    Query=../fusarium/analysis/blast_homology/six_genes/six-appended_parsed.fa
+    qsub $ProgDir/blast_pipe.sh $Query dna $Assembly
+  done
+```
+
+```
+
+```
+
+## 5.1.b) Converting BLAST results to gff annotations
+
+Once blast searches had completed, the BLAST hits were converted to GFF
+annotations:
+
+```bash
+	for BlastHits in $(ls analysis/blast_homology/*/*/*_six-appended_parsed.fa_homologs.csv | grep -e 'AJ516' -e 'AJ520'); do
+		Organism=$(echo $BlastHits | rev | cut -f3 -d '/' | rev)  
+		Strain=$(echo $BlastHits | rev | cut -f2 -d '/' | rev)
+		ProgDir=/home/armita/git_repos/emr_repos/tools/pathogen/blast
+		HitsGff=analysis/blast_homology/$Organism/$Strain/"$Strain"_six-appended_parsed.fa_homologs.gff
+		Column2=BLAST_hit
+		NumHits=1
+		$ProgDir/blast2gff.pl $Column2 $NumHits $BlastHits > $HitsGff
+	done
+```
