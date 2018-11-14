@@ -1105,7 +1105,7 @@ echo "$Organism - $Strain - $Timepoint"
 # echo $FileF
 # echo $FileR
 # Prefix=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
-OutDir=../../../../../data2/scratch/armita/fusarium_ex_narcissus/alignment/star/$Organism/$Strain/$Timepoint
+OutDir=../../../../../data/scratch/armita/fusarium_ex_narcissus/alignment/star/$Organism/$Strain/$Timepoint
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
 qsub $ProgDir/sub_star.sh $Assembly $FileF $FileR $OutDir
 echo "$Strain\t$Timepoint" >> alignment.log
